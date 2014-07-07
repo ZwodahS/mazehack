@@ -17,7 +17,7 @@ if __name__ == "__main__":
                 seedValue = int(sys.argv[1])
                 random.seed(seedValue)
 
-            maze = generate_maze(31, 31, {"holes" : 50})
+            maze = generate_maze(21, 21, {"holes" : 50})
             if len(sys.argv) > 3 and sys.argv[3] == "DEBUG":
                 for y in range(0, maze["y"]):
                     string = []

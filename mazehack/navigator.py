@@ -114,8 +114,6 @@ def move_instruction(maze, program_state, cpu = None):
         if in_range(maze, target_pos_x, target_pos_y) and is_passable(structure[target_pos_x][target_pos_y]):
             time_required = get_time(structure[program_state["x"]][program_state["y"]])
             if cpu is not None:
-                print(cpu)
-                print(time_required)
                 cpu -= time_required
             program_state["cpu"] -= time_required
             if program_state["cpu"] <= 0:

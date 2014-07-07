@@ -12,7 +12,11 @@ http://www.emanueleferonato.com/2008/12/08/perfect-maze-generation-tile-based-ve
 def generate_maze(x, y, config={}):
     structure = []
     for i in range(x): 
-        structure.append([6]*y)
+        l = []
+        for j in range(y):
+            # l.append(randint(1, 5) << 1)
+            l.append(6)
+        structure.append(l)
 
     maze = {
         "x" : x, 
