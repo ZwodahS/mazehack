@@ -5,9 +5,6 @@ from random import randint, choice
 
 from mazedef import is_passable, get_time, is_curved, set_passable, get_direction_mod, in_range, change_direction, opposite_direction_of
 from mazedef import NORTH, SOUTH, EAST, WEST
-
-PROBABILITY_CHANGE_DIRECTION = 5 # base chance for changing direction
-PROBABILITY_SPAWN = 5
 """
 Modified from 
 http://www.emanueleferonato.com/2008/12/08/perfect-maze-generation-tile-based-version-as3/
@@ -15,7 +12,7 @@ http://www.emanueleferonato.com/2008/12/08/perfect-maze-generation-tile-based-ve
 def generate_maze(x, y, config={}):
     structure = []
     for i in range(x): 
-        structure.append([0]*y)
+        structure.append([6]*y)
 
     maze = {
         "x" : x, 
@@ -39,7 +36,6 @@ def generate_maze(x, y, config={}):
     while len(moves) > 0 :
         possible_directions = []
         pos_x, pos_y = pos
-        print(pos) 
         if pos_x + 2 < x and not is_passable(structure[pos_x + 2][pos_y]):
             possible_directions.append(EAST)
         if pos_x - 2 > 0 and not is_passable(structure[pos_x - 2][pos_y]):
@@ -48,7 +44,6 @@ def generate_maze(x, y, config={}):
             possible_directions.append(SOUTH)
         if pos_y - 2 > 0 and not is_passable(structure[pos_x][pos_y - 2]):
             possible_directions.append(NORTH)
-        print(possible_directions)
         if(len(possible_directions)):
             direction = choice(possible_directions)
             direction_x, direction_y = get_direction_mod(direction)
@@ -60,4 +55,11 @@ def generate_maze(x, y, config={}):
             moves.append(pos)
         else:
             pos = moves.pop()
+
+    while True:
+        random_x = randint(0, x -1)
+        random_y = randint(0, y -1)
+        if is_passable(structure[random_x][random_y]) :
+            maze.update({ "start_x" : random_x, "start_y" : random_y })
+            break
     return maze
