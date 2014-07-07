@@ -6,13 +6,18 @@ from navigator import compile
 import random
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print "python test.py seed instructions"
+        print "python test.py <seed> <instructions>"
+        print "enter ? for seed to get a random seed"
     else:
         try:
-            seedValue = int(sys.argv[1])
-            random.seed(seedValue)
+            if sys.argv[1] == "?" :
+                seedValue = random.randint(0, 1000000)
+                print("".join(["Seed : ", str(seedValue)]))
+            else:
+                seedValue = int(sys.argv[1])
+                random.seed(seedValue)
 
-            maze = generate_maze(21, 21)
+            maze = generate_maze(31, 31, {"holes" : 50})
             if len(sys.argv) > 3 and sys.argv[3] == "DEBUG":
                 for y in range(0, maze["y"]):
                     string = []

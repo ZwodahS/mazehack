@@ -56,10 +56,17 @@ def generate_maze(x, y, config={}):
         else:
             pos = moves.pop()
 
+    if "holes" in config:
+        value = config["holes"]
+        for i in range(0, value):
+            random_x = randint(1, x -2)
+            random_y = randint(1, y -2)
+            set_passable(maze["structure"], random_x, random_y, True)
     while True:
-        random_x = randint(0, x -1)
-        random_y = randint(0, y -1)
+        random_x = randint(1, x -1)
+        random_y = randint(1, y -1)
         if is_passable(structure[random_x][random_y]) :
             maze.update({ "start_x" : random_x, "start_y" : random_y })
             break
+
     return maze

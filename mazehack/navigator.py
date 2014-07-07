@@ -27,7 +27,9 @@ def compile(string, max_length=100):
     curr_index = 0
     instructions = []
     while curr_index < len(string):
-        if string[curr_index] == "m" :
+        if string[curr_index] == " " :
+            True
+        elif string[curr_index] == "m" :
             if curr_index != len(string) -1 and not string[curr_index+1].isdigit():
                 instructions.append("MOVE")
             else :
