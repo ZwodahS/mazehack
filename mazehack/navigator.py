@@ -111,7 +111,9 @@ def move_instruction(maze, program_state, cpu = None):
         # check if we can move there
         if in_range(maze, target_pos_x, target_pos_y) and is_passable(structure[target_pos_x][target_pos_y]):
             time_required = get_time(structure[program_state["x"]][program_state["y"]])
-            if cpu is not None :
+            if cpu is not None:
+                print(cpu)
+                print(time_required)
                 cpu -= time_required
             program_state["cpu"] -= time_required
             if program_state["cpu"] <= 0:
@@ -161,7 +163,7 @@ def run_instructions(maze, instructions, debug=False):
                 turn_instruction(maze, program_state, int(instruction_split[1]))
         else :
             if instruction_split[0] == "MOVE":
-                move_instruction(maze, program_state, instruction)
+                move_instruction(maze, program_state)
             elif instruction_split[0] == "BEGIN":
                 begin_instruction(maze, program_state)
             elif instruction_split[0] == "END":
