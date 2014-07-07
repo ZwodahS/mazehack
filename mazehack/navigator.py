@@ -6,6 +6,8 @@ PROGRAM_TERMINATED_IN_NETWORK = 101
 PROGRAM_EXITS = 200
 """
 Available instructions are
+BEGIN
+END
 MOVE
 MOVE X (where X is a "cpu time")
 TURN LEFT/RIGHT/BACK
@@ -13,9 +15,49 @@ TURN LEFT/RIGHT/BACK
 
 """ 
 test if there are invalid instructions/insstruction length
+syntax:
+    must start with b for BEGIN
+    must end with e for END
+
+m followed by a number will be translated to MOVE X
+m followed by a non-number will be treated as MOVE
+t must be followed by l/r/b, 
 """
-def compile(instructions):
-    return True
+def compile(string, max_length=100):
+    curr_index = 0
+    instructions = []
+    while curr_index < len(string):
+        if string[curr_index] == "m" :
+            if curr_index != len(string) -1 and not string[curr_index+1].isdigit():
+                instructions.append("MOVE")
+            else :
+                intstring = []
+                while string[curr_index+1].isdigit():
+                    intstring.append(string[curr_index+1])
+                    curr_index+=1
+                instructions.append(" ".join(["MOVE", "".join(intstring)]))
+        elif string[curr_index] == "t" :
+            if curr_index == len(string) -1:
+                return False, { "error" : "".join(["Need a value after 'turn'"]) }
+            elif string[curr_index+1] == "r":
+                instructions.append(" ".join(["TURN", str(RIGHT)]))
+            elif string[curr_index+1] == "b":
+                instructions.append(" ".join(["TURN", str(BACK)]))
+            elif string[curr_index+1] == "l":
+                instructions.append(" ".join(["TURN", str(LEFT)]))
+            else:
+                return False, { "error" : "".join(["A value of either b/r/l (back/right/left) required after 'turn', found ", string[curr_index+1]]) }
+            curr_index+=1
+        elif string[curr_index] == "b" :
+            instructions.append("BEGIN")
+        elif string[curr_index] == "e" :
+            instructions.append("END")
+        else:
+            return False, { "error" : "".join(["Unrecognized symbol : ", str(string[curr_index])]) }
+        curr_index+=1
+    if len(instructions) > max_length:
+        return False, { "error" : "".join(["Number of instructions can only be at most ", str(max_length)]) }
+    return True, instructions
 
 
 def get_obj(x, y, facing_direction, maze, relative_direction):
@@ -59,7 +101,6 @@ def move_instruction(maze, program_state, cpu = None):
 
     structure = maze["structure"]
     while (cpu is None or cpu >= get_time(structure[program_state["x"]][program_state["y"]])) and (program_state["cpu"] > 0):
-        print(program_state["x"], program_state["y"])
         # add what we see to the logs
         saw = get_see(maze, program_state, True, True)
         for seen in saw : 
@@ -83,6 +124,7 @@ def move_instruction(maze, program_state, cpu = None):
             # can't move there
             program_state["logs"].append("".join(["    ", "Hit Obstacle at ", str(time), " cpu-time"]))
             return
+
     saw = get_see(maze, program_state)
     for seen in saw : 
         program_state["logs"].append("".join(["    ", seen, " at ", str(time), " cpu-time"]))
@@ -104,10 +146,11 @@ def begin_instruction(maze, program_state):
     for seen in saw : 
         program_state["logs"].append("".join(["    ", seen]))
 
-def run_instructions(maze, instructions):
-    result = {}
+def run_instructions(maze, instructions, debug=False):
+    result = {"logs":[]}
     program_state = {"cpu" : 200, "direction" : NORTH, "logs" : [] , "x" : maze["start_x"], "y" : maze["start_y"] } 
     current_instruction = 0 
+
     while program_state["cpu"] > 0 and current_instruction < len(instructions):
         instruction = instructions[current_instruction] 
         instruction_split = instruction.split(" ")
@@ -123,7 +166,6 @@ def run_instructions(maze, instructions):
                 begin_instruction(maze, program_state)
             elif instruction_split[0] == "END":
                 program_state["logs"].append("".join(["[End - ]"]))
-                print("End cond", program_state["x"], program_state["y"], maze["start_x"], maze["start_y"])
                 if program_state["x"] == maze["start_x"] and program_state["y"] == maze["start_y"]:
                     program_state["logs"].append("".join(["    ", "Successfully exit"]))
                     result["result_code"] = PROGRAM_EXITS
@@ -135,6 +177,7 @@ def run_instructions(maze, instructions):
         
     result["result_code"] = PROGRAM_TERMINATED_IN_NETWORK
     result["result"] = "Program terminated without returning"
-    result["logs"] = program_state["logs"]
+    if debug:
+        result["logs"] = program_state["logs"]
 
     return result
