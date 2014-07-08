@@ -1,0 +1,10 @@
+<ul class="nav nav-pills" >
+    <li ng-class="{ active:appCtrl.isSelected(1) }">
+        <a href ng-click="appCtrl.setSelected(1)">Users</a>
+    </li>
+    <li ng-class="{ active:appCtrl.isSelected(2) }">
+        <a href ng-click="appCtrl.setSelected(2)">Units</a>
+    </li>
+</ul>
+<users-panel ng-show="appCtrl.isSelected(1)"></users-panel>
+<units-panel ng-show="appCtrl.isSelected(2)"></units-panel>

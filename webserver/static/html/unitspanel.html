@@ -1,0 +1,153 @@
+<div class="container">
+    <div class="row">
+        <form name="unitSearchForm" >
+            <ul class = list-unstyled">
+                <li>
+                    <label for="street_name">Street :</label>
+                    <input type="text" ng-model="unitsCtrl.searchField.street_name" name="searchField_street_name" />
+                </li>
+                <li>
+                    <label for="city">City :</label>
+                    <input type="text" ng-model="unitsCtrl.searchField.city" name="searchField_city" />
+                </li>
+                <li>
+                    <label for="country">Country :</label>
+                    <input type="text" ng-model="unitsCtrl.searchField.country" name="searchField_country" />
+                </li>
+                <li>
+                    <label for="price">Price :</label>
+                    <input type="text" ng-model="unitsCtrl.searchField.price" name="searchField_price" placeholder="Try 1000-3000 or 2000> (less than 2000)" size=40/>
+                </li>
+                <li>
+                    <label for="num_rooms">Number of Rooms :</label>
+                    <input type="text" ng-model="unitsCtrl.searchField.num_rooms" name="searchField_num_rooms" placeholder="Try 1-2 or 3> (less than 3)" size=40/>
+                </li>
+                <li>
+                    <label for="num_bathrooms">Number of Bathrooms :</label>
+                    <input type="text" ng-model="unitsCtrl.searchField.num_bathrooms" name="searchField_num_bathrooms" placeholder="Try 1-2 or 1< (more than 1)" size=40/>
+                </li>
+            </ul>
+            <input type="submit" class="btn btn-primary pull-right" value="Search" ng-click="unitsCtrl.search()"/>
+        </form>
+    </div>
+    <div class="row">
+        <div class="col-xs-4">
+            <div class="list-group" ng-repeat="unit in unitsCtrl.unitslist">
+                <a class="list-group-item" ng-click="unitsCtrl.setSelectedUnit(unit)">{{ unit.address.block_number}}</a>
+            </div>
+        </div>
+        <div class="col-xs-8">
+            <div ng-show="unitsCtrl.mode == 'view'">
+                <ul class="list-unstyled">
+                    <li> Block         : {{ unitsCtrl.selectedUnit.address.block_number }} </li>
+                    <li> Street Name   : {{ unitsCtrl.selectedUnit.address.street_name }} </li>
+                    <li> Postal Code   : {{ unitsCtrl.selectedUnit.address.postal_code }} </li>
+                    <li> City          : {{ unitsCtrl.selectedUnit.address.city }} </li>
+                    <li> Country       : {{ unitsCtrl.selectedUnit.address.country }} </li>
+                    <li> Coordinates   : {{ unitsCtrl.selectedUnit.address.coordinates }} </li>
+                    <li> Price         : {{ unitsCtrl.selectedUnit.price }} </li>
+                    <li> Num Rooms     : {{ unitsCtrl.selectedUnit.num_rooms }} </li>
+                    <li> Num Bathrooms : {{ unitsCtrl.selectedUnit.num_bathrooms }} </li>
+                    <li> Size          : {{ unitsCtrl.selectedUnit.sqft }} </li>
+                    <input type="submit" class="btn btn-primary pull-right" value="New" ng-click="unitsCtrl.setMode('new')"/>
+                    <input type="submit" class="btn btn-primary pull-right" value="Edit" ng-click="unitsCtrl.setMode('edit')"/>
+                </ul>
+            </div>
+            <div ng-show="unitsCtrl.mode == 'edit'">
+                <form name="unitEditForm" novalidate>
+                    <ul class = list-unstyled">
+                        <li>
+                            <label for="block_number">Block :</label>
+                            <input type="text" ng-model="unitsCtrl.selectedUnit.address.block_number" name="block_number"/>
+                        </li>
+                        <li>
+                            <label for="street_name">Street :</label>
+                            <input type="text" ng-model="unitsCtrl.selectedUnit.address.street_name" name="street_name" />
+                        </li>
+                        <li>
+                            <label for="postal_code">Postal Code :</label>
+                            <input type="text" ng-model="unitsCtrl.selectedUnit.address.postal_code" name="postal_code" />
+                        </li>
+                        <li>
+                            <label for="city">City :</label>
+                            <input type="text" ng-model="unitsCtrl.selectedUnit.address.city" name="city" />
+                        </li>
+                        <li>
+                            <label for="country">Country :</label>
+                            <input type="text" ng-model="unitsCtrl.selectedUnit.address.country" name="country" />
+                        </li>
+                        <li>
+                            <label for="coordinates">Coordinates</label>
+                            <input type="text" ng-model="unitsCtrl.selectedUnit.address.coordinates" name="coordinates" />
+                        </li>
+                        <li>
+                            <label for="price">Price :</label>
+                            <input type="number" ng-model="unitsCtrl.selectedUnit.price" name="price" />
+                        </li>
+                        <li>
+                            <label for="num_rooms">Number of Rooms :</label>
+                            <input type="number" ng-model="unitsCtrl.selectedUnit.num_rooms" name="num_rooms" />
+                        </li>
+                        <li>
+                            <label for="num_bathrooms">Number of Bathrooms :</label>
+                            <input type="number" ng-model="unitsCtrl.selectedUnit.num_bathrooms" name="num_bathrooms" />
+                        </li>
+                        <li>
+                            <label for="sqft">Size(sqft) :</label>
+                            <input type="text" ng-model="unitsCtrl.selectedUnit.sqft" name="sqft" />
+                        </li>
+                    </ul>
+                    <input type="submit" class="btn btn-primary pull-right" value="Save" ng-click="unitsCtrl.save()"/>
+                </form>
+            </div>
+            <div ng-show="unitsCtrl.mode == 'new'">
+                <form name="unitEditForm" ng-submit="unitsCtrl.addNewUnit()" novalidate>
+                    <ul class = list-unstyled">
+                        <li>
+                            <label for="block_number">Block :</label>
+                            <input type="text" ng-model="unitsCtrl.newUnit.address.block_number" name="block_number"/>
+                        </li>
+                        <li>
+                            <label for="street_name">Street :</label>
+                            <input type="text" ng-model="unitsCtrl.newUnit.address.street_name" name="street_name" />
+                        </li>
+                        <li>
+                            <label for="postal_code">Postal Code :</label>
+                            <input type="text" ng-model="unitsCtrl.newUnit.address.postal_code" name="postal_code" />
+                        </li>
+                        <li>
+                            <label for="city">City :</label>
+                            <input type="text" ng-model="unitsCtrl.newUnit.address.city" name="city" />
+                        </li>
+                        <li>
+                            <label for="country">Country :</label>
+                            <input type="text" ng-model="unitsCtrl.newUnit.address.country" name="country" />
+                        </li>
+                        <li>
+                            <label for="coordinates">Coordinates</label>
+                            <input type="text" ng-model="unitsCtrl.newUnit.address.coordinates" name="coordinates" />
+                        </li>
+                        <li>
+                            <label for="price">Price :</label>
+                            <input type="number" ng-model="unitsCtrl.newUnit.price" name="price" />
+                        </li>
+                        <li>
+                            <label for="num_rooms">Number of Rooms :</label>
+                            <input type="number" ng-model="unitsCtrl.newUnit.num_rooms" name="num_rooms" />
+                        </li>
+                        <li>
+                            <label for="num_bathrooms">Number of Bathrooms :</label>
+                            <input type="number" ng-model="unitsCtrl.newUnit.num_bathrooms" name="num_bathrooms" />
+                        </li>
+                        <li>
+                            <label for="sqft">Size(sqft) :</label>
+                            <input type="text" ng-model="unitsCtrl.newUnit.sqft" name="sqft" />
+                        </li>
+                    </ul>
+                    <input type="submit" class="btn btn-primary pull-right" value="Cancel" ng-click="unitsCtrl.setMode('view')"/>
+                    <input type="submit" class="btn btn-primary pull-right" value="Save" />
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

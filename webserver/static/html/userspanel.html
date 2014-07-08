@@ -1,0 +1,26 @@
+<div class="container">
+    <div class="row">
+        <form name="userSearchForm"  ng-submit="usersCtrl.search()">
+            <fieldset class="form-group">
+                <input ng-model="usersCtrl.searchField.email" type="text" class="form-control" placeholder="search email" title="Email" />
+                <input type="submit" class="btn btn-primary pull-right" value="Search" />
+            </fieldset>
+        </form>
+    </div>
+    <div class="row">
+        <div class="col-xs-4">
+            <div class="list-group" ng-repeat="user in usersCtrl.userslist">
+                <a class="list-group-item" ng-click="usersCtrl.setSelectedUser(user)">{{user["email"]}}</a>
+            </div>
+        </div>
+        <div class="col-xs-8">
+            <div>
+                <ul class="list-unstyled">
+                    <li> Email : {{ usersCtrl.selectedUser.email }} </li>
+                    <li> First Name : {{ usersCtrl.selectedUser.first_name }} </li>
+                    <li> Last Name : {{ usersCtrl.selectedUser.last_name }} </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

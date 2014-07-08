@@ -1,8 +1,9 @@
 import sys
-from mazedef import get_time, is_passable
-from generator import generate_maze
-from navigator import run_instructions
-from navigator import compile
+from mazehack.mazedef import get_time, is_passable
+from mazehack.generator import generate_maze
+from mazehack.navigator import run_instructions
+from mazehack.navigator import compile
+import json
 import random
 if __name__ == "__main__":
     if len(sys.argv) < 3:
@@ -16,8 +17,9 @@ if __name__ == "__main__":
             else:
                 seedValue = int(sys.argv[1])
                 random.seed(seedValue)
-
-            maze = generate_maze(21, 21, {"holes" : 50})
+            d = generate_maze(61, 41)
+            e = json.dumps(d)
+            maze = json.loads(e)
             if len(sys.argv) > 3 and sys.argv[3] == "DEBUG":
                 for y in range(0, maze["y"]):
                     string = []
@@ -44,4 +46,3 @@ if __name__ == "__main__":
 
         except ValueError:
             print("Enter a numerical seed")
-

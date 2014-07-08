@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html ng-app="maze">
+    <head>
+    <title>MazeHack</title>
+        <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/static/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="/static/css/style.css">
+        <script type="text/javascript" src="/static/js/angular.min.js"></script>
+        <script type="text/javascript" src="/static/js/app.js"></script>
+    </head>
+    <body ng-controller="MazeController as mazeCtrl">
+        Welcome to MazeHack
+        <form name="instruction_form" ng-submit="mazeCtrl.execute()">
+            <fieldset class="form-group">
+                <input ng-model="mazeCtrl.mazeid" type="text" class="form-control" placeholder="Enter maze id, try 'entrance' if you don't know any" title="Instruction" />
+            <fieldset>
+            <fieldset class="form-group">
+                <input ng-model="mazeCtrl.instruction" type="text" class="form-control" placeholder="start exploring by executing 'be'" title="Instruction" />
+                <input type="submit" value="Execute" />
+            <fieldset>
+        </form>
+        <log></log>
+    </body>
+</html>
+

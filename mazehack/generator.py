@@ -14,7 +14,6 @@ def generate_maze(x, y, config={}):
     for i in range(x): 
         l = []
         for j in range(y):
-            # l.append(randint(1, 5) << 1)
             l.append(6)
         structure.append(l)
 
@@ -24,15 +23,13 @@ def generate_maze(x, y, config={}):
         "structure" : structure,
     }
 
-    back = 0
-    move = 0
     starting_pos_x = randint(0, x-1)
     if not starting_pos_x % 2:
         starting_pos_x -= 1
     starting_pos_y = randint(0, y-1)
     if not starting_pos_y % 2:
         starting_pos_y -= 1
-    pos = (1, 1)
+    pos = (starting_pos_x, starting_pos_y)
        
     moves = [] 
     moves.append(pos)
@@ -60,12 +57,6 @@ def generate_maze(x, y, config={}):
         else:
             pos = moves.pop()
 
-    if "holes" in config:
-        value = config["holes"]
-        for i in range(0, value):
-            random_x = randint(1, x -2)
-            random_y = randint(1, y -2)
-            set_passable(maze["structure"], random_x, random_y, True)
     while True:
         random_x = randint(1, x -1)
         random_y = randint(1, y -1)

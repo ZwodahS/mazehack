@@ -1,6 +1,6 @@
 from mazedef import NORTH, SOUTH, EAST, WEST
 from mazedef import LEFT, RIGHT, FRONT, BACK
-from mazedef import get_relative_direction_string, get_time, is_passable, get_direction_of, get_direction_mod, in_range
+from mazedef import get_relative_direction_string, get_time, is_passable, get_direction_of, get_direction_mod, in_range, can_exit
 TOO_MANY_INSTRUCTION = 100
 PROGRAM_TERMINATED_IN_NETWORK = 101
 PROGRAM_EXITS = 200
@@ -14,19 +14,20 @@ TURN LEFT/RIGHT/BACK
 """
 
 """ 
-test if there are invalid instructions/insstruction length
-syntax:
+Compile a string to a instructions list
+
+syntax for the string
     must start with b for BEGIN
     must end with e for END
-
-m followed by a number will be translated to MOVE X
-m followed by a non-number will be treated as MOVE
-t must be followed by l/r/b, 
+    m followed by a number will be translated to MOVE X
+    m followed by a non-number will be treated as MOVE
+    t must be followed by l/r/b, 
 """
 def compile(string, max_length=100):
-    curr_index = 0
-    instructions = []
-    while curr_index < len(string):
+    
+    curr_index = 0  
+    instructions = [] 
+    while curr_index < len(string):  
         if string[curr_index] == " " :
             True
         elif string[curr_index] == "m" :
@@ -61,7 +62,9 @@ def compile(string, max_length=100):
         return False, { "error" : "".join(["Number of instructions can only be at most ", str(max_length)]) }
     return True, instructions
 
-
+"""
+Get object at position
+"""
 def get_obj(x, y, facing_direction, maze, relative_direction):
     target_direction = get_direction_of(relative_direction, facing_direction)
     mod_x, mod_y = get_direction_mod(target_direction)
@@ -70,7 +73,6 @@ def get_obj(x, y, facing_direction, maze, relative_direction):
         if is_passable(maze["structure"][target_pos_x][target_pos_y]):
             return "[Empty Space]"
     return None
-
 
 def get_see(maze, program_state, ignoreFront=False, ignoreBack=False):
     saw = []
@@ -81,7 +83,6 @@ def get_see(maze, program_state, ignoreFront=False, ignoreBack=False):
     obj = get_obj(program_state["x"], program_state["y"], program_state["direction"], maze, RIGHT)
     if obj is not None:
         saw.append(" ".join(["Saw", obj, "On the Right"]))
-
     if not ignoreFront:
         obj = get_obj(program_state["x"], program_state["y"], program_state["direction"], maze, FRONT)
         if obj is not None:
@@ -90,7 +91,6 @@ def get_see(maze, program_state, ignoreFront=False, ignoreBack=False):
         obj = get_obj(program_state["x"], program_state["y"], program_state["direction"], maze, BACK)
         if obj is not None:
             saw.append(" ".join(["Saw", obj, "Behind"]))
-
     return saw
 
 def move_instruction(maze, program_state, cpu = None):
@@ -148,14 +148,20 @@ def begin_instruction(maze, program_state):
     for seen in saw : 
         program_state["logs"].append("".join(["    ", seen]))
 
+
+"""
+The main run instructions method, all that you need.
+"""
 def run_instructions(maze, instructions, debug=False):
     result = {"logs":[]}
     program_state = {"cpu" : 200, "direction" : NORTH, "logs" : [] , "x" : maze["start_x"], "y" : maze["start_y"] } 
     current_instruction = 0 
-
+    
+    # terminates when the program do not have any more cpu or when the instruction runs out.
     while program_state["cpu"] > 0 and current_instruction < len(instructions):
         instruction = instructions[current_instruction] 
         instruction_split = instruction.split(" ")
+
         if len(instruction_split) > 1 :
             if instruction_split[0] == "MOVE":
                 move_instruction(maze, program_state, int(instruction_split[1]))
@@ -168,7 +174,7 @@ def run_instructions(maze, instructions, debug=False):
                 begin_instruction(maze, program_state)
             elif instruction_split[0] == "END":
                 program_state["logs"].append("".join(["[End - ]"]))
-                if program_state["x"] == maze["start_x"] and program_state["y"] == maze["start_y"]:
+                if can_exit(maze, program_state["x"], program_state["y"]) :
                     program_state["logs"].append("".join(["    ", "Successfully exit"]))
                     result["result_code"] = PROGRAM_EXITS
                     result["result"] = "Program exits properly"

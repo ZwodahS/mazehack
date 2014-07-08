@@ -31,14 +31,12 @@ The next bit stores if it is a curve value
 
 XXXXXXXXX[exit:1][speed:3][passable:1]
 """
-
 def is_passable(value):
     return value & 1 > 0
 
 def set_passable(structure, x, y, value):
     newvalue = structure[x][y] 
     structure[x][y] = calculate_bit(structure[x][y], 0, 1 if value else 0)
-
 """ 
 get the time needed to move out of the tile
 """
@@ -61,6 +59,11 @@ def set_time(value, time_value):
 def is_curved(value):
     return value & 16 > 0
 
+def can_exit(maze, x, y):
+    if maze["start_x"] == x and maze["start_y"] == y :
+        return True
+    return False
+
 """ Constants for direction """
 NORTH = 0
 SOUTH = 1
@@ -72,6 +75,7 @@ FRONT = 0
 BACK = 1
 RIGHT = 2
 LEFT = 3
+BELOW = 4
 """
 origin is top left
 """
@@ -160,4 +164,9 @@ def opposite_direction_of(direction):
     else:
         return EAST
 
-
+def to_maze(data):
+    maze = { "x" : 0, "y" : 0, "structure" : [], "start_x" : 0, "start_y" : 0}
+    for k in maze:
+        if k in data:
+            maze[k] = data[k]
+    return maze
