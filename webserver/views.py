@@ -27,6 +27,10 @@ def view_get_maze(id):
         return jsonify({}), 404
     return jsonify(maze), 200
 
+@app.route("/execute/<string:id>", methods=["GET"])
+def view_execute_empty_instructions(id):
+    return view_execute_instructions(id, "")
+
 @app.route("/execute/<string:id>/<string:instruction>", methods=["GET"])
 def view_execute_instructions(id, instruction):
     maze = db_get_maze(id)

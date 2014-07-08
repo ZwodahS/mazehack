@@ -9,7 +9,14 @@
 
             controller.result = ""
             controller.logs = []
-            $http.get("/execute/"+this.mazeid+"/"+this.instruction).success(function(data){
+            url = "";
+            if(this.instruction.trim() == ""){
+                url =  "/execute/"+this.mazeid;
+            }
+            else{
+                url =  "/execute/"+this.mazeid+"/"+this.instruction;
+            }
+            $http.get(url).success(function(data){
                 controller.result = data["result"]
                 if(data["result_code"] == 200){
                     controller.logs = data["logs"]

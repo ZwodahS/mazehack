@@ -1,5 +1,6 @@
 import pymongo
 from mazehack.mazedef import to_maze
+from mazehack.mazedef import get_time, is_passable
 from webserver import app
 from flask import g, jsonify
 from pymongo import MongoClient
@@ -60,5 +61,19 @@ def db_reset_mazes():
     db["mazes"].remove({})
     db["mazes_id"].remove({})
 
-    maze = generator.generate_maze(51, 51, {})
+    maze = generator.generate_maze(21, 21, {})
+    print("Maze generated")
+
+    for y in range(0, maze["y"]):
+        string = []
+        for x in range(0, maze["x"]):
+            if x == maze["start_x"] and y == maze["start_y"]:
+                string.append("@")
+            elif is_passable(maze["structure"][x][y]):
+                string.append(" ")
+            else :
+                string.append("#")
+        print("".join(string))
+    print("StartX: " + str(maze["start_x"]))
+    print("StartY: " + str(maze["start_y"]))
     db_add_maze(maze, "entrance")

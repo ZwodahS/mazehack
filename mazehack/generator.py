@@ -14,7 +14,7 @@ def generate_maze(x, y, config={}):
     for i in range(x): 
         l = []
         for j in range(y):
-            l.append(6)
+            l.append(2)
         structure.append(l)
 
     maze = {
