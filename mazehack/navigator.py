@@ -114,9 +114,10 @@ def move_instruction(maze, program_state):
     while success and program_state["cpu"] > 0:
         success, cost = move_in_this_direction(maze, program_state)
         time += cost
-        if is_decision(maze, program_state):
-            program_state["logs"].append("".join(["Move terminates after ", str(time), " cpu-cycle."]))
+        if is_decision(maze, program_state) or not success:
             break
+
+    program_state["logs"].append("".join(["Move terminates after ", str(time), " cpu-cycle."]))
     add_information(maze, program_state)
 
 def turn_instruction(maze, program_state, relative_direction):
@@ -192,7 +193,6 @@ def run_instructions(maze, instructions, debug=False):
         
     result["result_code"] = PROGRAM_TERMINATED_IN_NETWORK
     result["result"] = "Program terminated without returning"
-    if debug:
-        result["logs"] = program_state["logs"]
+    result["logs"] = program_state["logs"]
 
     return result
