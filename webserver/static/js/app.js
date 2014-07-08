@@ -22,7 +22,6 @@
                     controller.logs = data["logs"]
                 }
             }).error(function(data){
-                alert(data["error"])
             });
         };
     }]);

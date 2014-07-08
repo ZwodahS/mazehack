@@ -9,7 +9,8 @@
         <script type="text/javascript" src="/static/js/app.js"></script>
     </head>
     <body ng-controller="MazeController as mazeCtrl">
-        Welcome to MazeHack
+        Welcome to MazeHack.
+        Read <a href="http://zwodahs.github.io/blog/2014/07/08/new-game-idea/">This</a> for more detail.
         <form name="instruction_form" ng-submit="mazeCtrl.execute()">
             <fieldset class="form-group">
                 <input ng-model="mazeCtrl.mazeid" type="text" class="form-control" placeholder="Enter maze id, try 'entrance' if you don't know any" title="Instruction" />

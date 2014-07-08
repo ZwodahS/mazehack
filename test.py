@@ -17,7 +17,7 @@ if __name__ == "__main__":
             else:
                 seedValue = int(sys.argv[1])
                 random.seed(seedValue)
-            d = generate_maze(11, 11)
+            d = generate_maze(21, 21)
             e = json.dumps(d)
             maze = json.loads(e)
             if len(sys.argv) > 3 and sys.argv[3] == "DEBUG":
