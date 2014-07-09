@@ -1,6 +1,6 @@
 import sys
 from mazehack.mazedef import get_time, is_passable
-from mazehack.generator import generate_maze
+from mazehack.generator import generate_maze, get_random_variable_position
 from mazehack.navigator import run_instructions
 from mazehack.navigator import compile
 import json
@@ -17,7 +17,8 @@ if __name__ == "__main__":
             else:
                 seedValue = int(sys.argv[1])
                 random.seed(seedValue)
-            d = generate_maze(21, 21)
+            # d = generate_maze(31, 31)
+            d = generate_maze(21, 21, {"holes" : 30})
             e = json.dumps(d)
             maze = json.loads(e)
             if len(sys.argv) > 3 and sys.argv[3] == "DEBUG":

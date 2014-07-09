@@ -1,58 +1,15 @@
 from mazedef import NORTH, SOUTH, EAST, WEST
 from mazedef import LEFT, RIGHT, FRONT, BACK
 from mazedef import get_relative_direction_string, get_time, is_passable, get_direction_of, get_direction_mod, in_range, can_exit
+from instructions import compile
 TOO_MANY_INSTRUCTION = 100
 PROGRAM_TERMINATED_IN_NETWORK = 101
 PROGRAM_EXITS = 200
-"""
-Available instructions are
-BEGIN : begin
-END : if the position is a backdoor or entrance, the program will exit with logs
-MOVE : move to the next "decision point"
-LEFT : turn left
-RIGHT : turn right
-BACK : turn back
-"""
-
-""" 
-Compile a string to a instructions list
-syntax for the string
-    m for MOVE
-    l for LEFT
-    r for RIGHT
-    b for BACK
-"""
-def compile(string, max_length=100):
-    curr_index = 0  
-    instructions = ["BEGIN"] 
-    while curr_index < len(string):  
-        if string[curr_index] == " " :  # allow for empty space
-            True
-        elif string[curr_index] == "m" :
-            instructions.append("MOVE")
-        elif string[curr_index] == "r":
-            instructions.append("RIGHT")
-        elif string[curr_index] == "b":
-            instructions.append("BACK")
-        elif string[curr_index] == "l":
-            instructions.append("LEFT")
-        else:
-            return False, { "error" : "".join(["Unrecognized symbol : ", str(string[curr_index])]) }
-        curr_index+=1
-    if len(instructions) > max_length:
-        return False, { "error" : "".join(["Number of instructions can only be at most ", str(max_length)]) }
-    instructions.append("END")
-    return True, instructions
-
-"""
-Get object at position
-"""
 
 def can_pass_through(maze, pos_x, pos_y, program_state):
     if in_range(maze, pos_x, pos_y) and is_passable(maze["structure"][pos_x][pos_y]):
         return True
     else:
-### check for doors ???
         return False
 
 def move_to(maze, target_pos_x, target_pos_y, program_state):
@@ -68,6 +25,14 @@ such that values[RIGHT] is a bool representing if that direction is passable
 """
 def get_passable_direction(maze, program_state):
     returnVal = []
+    for d in range(0, 4):  # NORTH SOUTH EAST WEST
+        direction_mod_x, direction_mod_y = get_direction_mod(d)
+        target_pos_x, target_pos_y = program_state["x"] + direction_mod_x, program_state["y"] + direction_mod_y
+        returnVal.append(can_pass_through(maze, target_pos_x, target_pos_y, program_state))
+    return returnVal
+
+def get_passable_relative_direction(maze, program_state):
+    returnVal = []
     for d in range(0, 4): # FRONT BACK RIGHT LEFT
         direction_mod_x, direction_mod_y = get_direction_mod(get_direction_of(d, program_state["direction"]))
         target_pos_x, target_pos_y = program_state["x"] + direction_mod_x, program_state["y"] + direction_mod_y
@@ -75,7 +40,7 @@ def get_passable_direction(maze, program_state):
     return returnVal
 
 def is_decision(maze, program_state):
-    passable = get_passable_direction(maze, program_state)
+    passable = get_passable_relative_direction(maze, program_state)
     num_exit = sum(passable)
     if num_exit > 2 :
         return True
@@ -86,7 +51,7 @@ def is_decision(maze, program_state):
 def move_in_this_direction(maze, program_state):
     time_required = 0
     ## get the relative direction that the program can pass
-    passable = get_passable_direction(maze, program_state)
+    passable = get_passable_relative_direction(maze, program_state)
 
     direction = program_state["direction"]
     if passable[FRONT] :  #if the front is passable, we just move in front
@@ -131,7 +96,7 @@ def begin_instruction(maze, program_state):
     add_information(maze, program_state)
 
 def add_information(maze, program_state):
-    passable = get_passable_direction(maze, program_state)
+    passable = get_passable_relative_direction(maze, program_state)
     if passable[FRONT] :
         program_state["logs"].append("".join(["[    ","Front is passable","]"]))
     else :

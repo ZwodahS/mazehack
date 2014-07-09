@@ -23,10 +23,10 @@ def generate_maze(x, y, config={}):
         "structure" : structure,
     }
 
-    starting_pos_x = randint(0, x-1)
+    starting_pos_x = randint(0, x-2)
     if not starting_pos_x % 2:
         starting_pos_x -= 1
-    starting_pos_y = randint(0, y-1)
+    starting_pos_y = randint(0, y-2)
     if not starting_pos_y % 2:
         starting_pos_y -= 1
     pos = (starting_pos_x, starting_pos_y)
@@ -56,12 +56,43 @@ def generate_maze(x, y, config={}):
             moves.append(pos)
         else:
             pos = moves.pop()
+    
+    random_x, random_y = get_random_passable_position(maze["x"], maze["y"])
+    maze.update({ "start_x" : random_x, "start_y" : random_y })
 
-    while True:
-        random_x = randint(1, x -1)
-        random_y = randint(1, y -1)
-        if is_passable(structure[random_x][random_y]) :
-            maze.update({ "start_x" : random_x, "start_y" : random_y })
-            break
+    if "holes" in config:
+        for i in range(0, config["holes"]):
+            hole_x, hole_y = get_random_variable_position(maze["x"], maze["y"])
+            set_passable(maze["structure"], hole_x, hole_y, True)
 
     return maze
+
+# get a random spot on the maze that is ALWAYS PASSABLE
+def get_random_passable_position(x, y):
+    random_x = randint(1, x-1)
+    random_y = randint(1, y-1)
+    if not random_x % 2 :
+        random_x -= 1
+    if not random_y % 2 :
+        random_y -= 1
+
+    return random_x, random_y
+
+def get_random_variable_position(x, y):
+    random_x = randint(1, x-2)
+    random_y = randint(1, y-2)
+    # if both are even or both are odd, then we randomly decrease one of them
+    if not (random_x + random_y) % 2 :
+        if random_x == 1 :
+            random_y -= 1
+        elif random_y == 1:
+            random_x -= 1
+        else:
+            choice = randint(0, 1)
+            if choice:
+                random_x -= 1
+            else:
+                random_y -= 1
+
+    return random_x, random_y
+

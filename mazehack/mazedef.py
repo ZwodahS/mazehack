@@ -1,4 +1,19 @@
 from random import randint
+""" Constants for direction """
+NORTH = 0
+SOUTH = 1
+EAST = 2
+WEST = 3
+
+""" Constants for direction respective to direction"""
+FRONT = 0
+BACK = 1
+RIGHT = 2
+LEFT = 3
+BELOW = 4
+"""
+origin is top left
+"""
 """
 This file contains all the definition used to interpret a int value to see if it passable
 or the speed or what kind of "thing" it contains.
@@ -64,21 +79,6 @@ def can_exit(maze, x, y):
         return True
     return False
 
-""" Constants for direction """
-NORTH = 0
-SOUTH = 1
-EAST = 2
-WEST = 3
-
-""" Constants for direction respective to direction"""
-FRONT = 0
-BACK = 1
-RIGHT = 2
-LEFT = 3
-BELOW = 4
-"""
-origin is top left
-"""
 def get_direction_mod(direction):
     if direction == NORTH:
         return (0, -1)
