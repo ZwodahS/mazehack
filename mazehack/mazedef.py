@@ -20,8 +20,9 @@ or the speed or what kind of "thing" it contains.
 """
 """
 right most bit's index is 0
+set the bit at index of the original_value to a value
 """
-def calculate_bit(original_value, index, value):
+def set_bit(original_value, index, value):
     mask = 1 << index  # create mask
     original_value &= ~mask         # extract everything except the index
     if value:              # if value is 1, then we need to set it to 1
@@ -44,35 +45,29 @@ The next bit stores if it is a curve value
         2. None of the exit is a door
         3. The exit is NOT opposite of each other (although it makes no different)
 
-XXXXXXXXX[exit:1][speed:3][passable:1]
+XXXXXXXXXXXXXXXXXXXX[data:2][wall:1]
+if wall value is 0 then there is no wall
+if data is 1, then there is a data in the maze structure 
+
 """
-def is_passable(value):
+def is_wall(value):
     return value & 1 > 0
 
-def set_passable(structure, x, y, value):
-    newvalue = structure[x][y] 
-    structure[x][y] = calculate_bit(structure[x][y], 0, 1 if value else 0)
-""" 
-get the time needed to move out of the tile
+def set_wall(maze, x, y, value):
+    newvalue = maze["structure"][x][y] 
+    maze["structure"][x][y] = set_bit(maze["structure"][x][y], 0, 1 if value else 0)
 """
-def get_time(value):
-    time = (value & 14) >> 1
-    return pow(2, time-1)
-""" 
-Must be 1, 2, 3, 4, 5
 """
-def set_time(value, time_value):
-    if time_value < 1 or time_value > 5:
-        time_value = 3
-    time_value << 1
-    mask = 7 << 1
-    value &= ~mask
-    value |= time_value
-    return value
-    
 
-def is_curved(value):
-    return value & 16 > 0
+def is_adjacent(pos_x, pos_y, target_x, target_y):
+    distance = abs(pos_x - pos_y) + abs(target_x - target_y)
+    return distance == 1
+
+def is_passable_from(maze, pos_x, pos_y, target_x, target_y):
+    target = maze[target_x][target_y]
+    if is_wall(target) :
+        return False
+    return True
 
 def can_exit(maze, x, y):
     if maze["start_x"] == x and maze["start_y"] == y :
@@ -90,16 +85,6 @@ def get_direction_mod(direction):
         return (-1, 0)
     else :
         return (0, 0)
-
-def get_relative_direction_string(direction):
-    if direction == FRONT:
-        return "FRONT"
-    elif direction == BACK:
-        return "BACK"
-    elif direction == RIGHT:
-        return "RIGHT"
-    else: # direction == LEFT
-        return "LEFT"
 
 """
 get_direction_of(LEFT, NORTH)
@@ -137,6 +122,15 @@ def get_direction_of(relative_direction, direction):
             return WEST
         else: #WEST
             return EAST
+def get_relative_direction_string(relative_direction):
+    if relative_direction == FRONT:
+        return "Front"
+    elif relative_direction == LEFT:
+        return "Left"
+    elif relative_direction == RIGHT:
+        return "Right"
+    else:
+        return "Back"
 
 def in_range(maze, x, y):
     return x >= 0 and x < maze["x"] and y >= 0 and y < maze["y"] 
@@ -164,9 +158,66 @@ def opposite_direction_of(direction):
     else:
         return EAST
 
+def is_decision_point(maze, pos_x, pos_y, facing_direction):
+    passable = get_passable_relative_direction(maze, pos_x, pos_y, facing_direction, can_pass_through)
+    num_exit = sum(passable)
+    if num_exit > 2:
+        return True
+    return False
+
 def to_maze(data):
     maze = { "x" : 0, "y" : 0, "structure" : [], "start_x" : 0, "start_y" : 0}
     for k in maze:
         if k in data:
             maze[k] = data[k]
     return maze
+
+def can_pass_through(maze, pos_x, pos_y, target_x, target_y):
+    # make sure that we are in range for both source and target
+    if not in_range(maze, pos_x, pos_y) or not in_range(maze, target_x, target_y):
+        return False
+    if is_wall(maze["structure"][target_x][target_y]):
+        return False
+    return True
+
+
+"""
+Navigation Code for navigating a maze.
+"""
+
+"""
+Move the state to the position
+"""
+def move_to(maze, target_pos_x, target_pos_y, state):
+    time_required = 1
+    state["x"] = target_pos_x
+    state["y"] = target_pos_y
+    return time_required
+
+"""
+can_pass_through : 
+    function that takes in a maze, pos_x, pos_y, target_pos_x, target_pos_y
+    return boolean representing if target_pos_x, target_pos_y is reachable from pos_x, pos_y
+"""
+def get_passable_direction(maze, pos_x, pos_y, can_pass_through):
+    returnVal = []
+    for d in range(0, 4):  # NORTH SOUTH EAST WEST
+        direction_mod_x, direction_mod_y = get_direction_mod(d)
+        target_pos_x, target_pos_y = pos_x + direction_mod_x, pos_y + direction_mod_y
+        returnVal.append(can_pass_through(maze, pos_x, pos_y, target_pos_x, target_pos_y))
+    return returnVal
+
+"""
+facing_direction : the direction that the program is facing
+can_pass_through : 
+    function that takes in a maze, pos_x, pos_y, target_pos_x, target_pos_y
+    return boolean representing if target_pos_x, target_pos_y is reachable from pos_x, pos_y
+
+"""
+def get_passable_relative_direction(maze, pos_x, pos_y, facing_direction, can_pass_through):
+    returnVal = []
+    for d in range(0, 4):  # FRONT BACK RIGHT LEFT
+        direction_mod_x, direction_mod_y = get_direction_mod(get_direction_of(d, facing_direction))
+        target_pos_x, target_pos_y = pos_x + direction_mod_x, pos_y + direction_mod_y
+        returnVal.append(can_pass_through(maze, pos_x, pos_y, target_pos_x, target_pos_y))
+    return returnVal

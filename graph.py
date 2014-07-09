@@ -1,18 +1,16 @@
 import sys
 import random
+from mazehack import mazedef, generator
 from mazehack.mazedef import NORTH, SOUTH, EAST, WEST
 from mazehack.mazedef import FRONT, BACK, RIGHT, LEFT 
-from mazehack.navigator import get_passable_direction, get_passable_relative_direction, is_decision
-from mazehack.generator import generate_maze, get_random_passable_position
-from mazehack.mazedef import get_relative_direction_string, get_time, is_passable, get_direction_of, get_direction_mod, in_range, can_exit
 """
 generate the graph from a maze
 """
 def move_to(maze, target_pos_x, target_pos_y, traverser):
-    time_required = get_time(maze["structure"][traverser["x"]][traverser["y"]])
     traverser["x"] = target_pos_x
     traverser["y"] = target_pos_y
-    return time_required
+    return 1
+
 # adapted from the one in navigator
 def move_in_this_direction(maze, traverser):
     time_required = 0
@@ -23,6 +21,7 @@ def move_in_this_direction(maze, traverser):
     if passable[FRONT] :  #if the front is passable, we just move in front
         direction = traverser["direction"]
     else:                 # front is not passable, we want check if both left and right is passable
+        # if both left and right is passable, we can't make the decision, so we don't move
         if passable[LEFT] and passable[RIGHT]:
             return False, 0
         elif passable[LEFT]:
@@ -37,7 +36,9 @@ def move_in_this_direction(maze, traverser):
     target_pos_x, target_pos_y = traverser["x"] + direction_mod_x, traverser["y"] + direction_mod_y
     time_required = move_to(maze, target_pos_x, target_pos_y, traverser)
     return True, time_required
-
+"""
+move from the current position to the next part of the maze
+"""
 def move_to_next_node(maze, traverser):
     structure = maze["structure"]
     success, time = move_in_this_direction(maze, traverser)
@@ -47,7 +48,9 @@ def move_to_next_node(maze, traverser):
         if is_decision(maze, traverser) or not success:
             break
     return time
-
+"""
+Find a node in nodes, that is a x, y position
+"""
 def find_node(nodes, x, y):
     new_nodes = [n for n in nodes if n["x"] == x and n["y"] == y]
     if new_nodes:
@@ -133,21 +136,21 @@ if __name__ == "__main__" :
             seedValue = int(sys.argv[1])
             random.seed(seedValue)
 
-    maze = generate_maze(11, 11, {"holes" : 30})
+    maze = generator.generate_maze(11, 11, {"holes" : 30})
     for y in range(0, maze["y"]):
         string = []
         for x in range(0, maze["x"]):
             if x == maze["start_x"] and y == maze["start_y"]:
                 string.append("@")
-            elif is_passable(maze["structure"][x][y]):
-                string.append(" ")
-            else :
+            elif mazedef.is_wall(maze["structure"][x][y]):
                 string.append("#")
+            else :
+                string.append(" ")
         print("".join(string))
     print("StartX: " + str(maze["start_x"]))
     print("StartY: " + str(maze["start_y"]))
 
 
-    graph = generate_graph(maze)
-    for n in graph :
-        print(n)
+    # graph = generate_graph(maze)
+    # for n in graph :
+    #     print(n)

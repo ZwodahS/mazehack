@@ -3,7 +3,7 @@ This method generate a maze, and stores it in a 2D "array"
 """
 from random import randint, choice
 
-from mazedef import is_passable, get_time, is_curved, set_passable, get_direction_mod, in_range, change_direction, opposite_direction_of
+from mazedef import is_wall, set_wall, get_direction_mod, in_range, change_direction, opposite_direction_of
 from mazedef import NORTH, SOUTH, EAST, WEST
 """
 Modified from 
@@ -14,7 +14,7 @@ def generate_maze(x, y, config={}):
     for i in range(x): 
         l = []
         for j in range(y):
-            l.append(2)
+            l.append(1)
         structure.append(l)
 
     maze = {
@@ -37,21 +37,21 @@ def generate_maze(x, y, config={}):
     while len(moves) > 0 :
         possible_directions = []
         pos_x, pos_y = pos
-        if pos_x + 2 < x and not is_passable(structure[pos_x + 2][pos_y]):
+        if pos_x + 2 < x and is_wall(structure[pos_x + 2][pos_y]):
             possible_directions.append(EAST)
-        if pos_x - 2 > 0 and not is_passable(structure[pos_x - 2][pos_y]):
+        if pos_x - 2 > 0 and is_wall(structure[pos_x - 2][pos_y]):
             possible_directions.append(WEST)
-        if pos_y + 2 < y and not is_passable(structure[pos_x][pos_y + 2]):
+        if pos_y + 2 < y and is_wall(structure[pos_x][pos_y + 2]):
             possible_directions.append(SOUTH)
-        if pos_y - 2 > 0 and not is_passable(structure[pos_x][pos_y - 2]):
+        if pos_y - 2 > 0 and is_wall(structure[pos_x][pos_y - 2]):
             possible_directions.append(NORTH)
         if(len(possible_directions)):
             direction = choice(possible_directions)
             direction_x, direction_y = get_direction_mod(direction)
             target_x, target_y = (pos_x + direction_x, pos_y + direction_y)
-            set_passable(structure, target_x, target_y, True)
+            set_wall(maze, target_x, target_y, False)
             target_x, target_y = (target_x + direction_x, target_y + direction_y)
-            set_passable(structure, target_x, target_y, True)
+            set_wall(maze, target_x, target_y, False)
             pos = (target_x, target_y)
             moves.append(pos)
         else:
@@ -59,11 +59,6 @@ def generate_maze(x, y, config={}):
     
     random_x, random_y = get_random_passable_position(maze["x"], maze["y"])
     maze.update({ "start_x" : random_x, "start_y" : random_y })
-
-    if "holes" in config:
-        for i in range(0, config["holes"]):
-            hole_x, hole_y = get_random_variable_position(maze["x"], maze["y"])
-            set_passable(maze["structure"], hole_x, hole_y, True)
 
     return maze
 

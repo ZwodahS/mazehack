@@ -1,5 +1,5 @@
 import sys
-from mazehack.mazedef import get_time, is_passable
+from mazehack.mazedef import is_wall
 from mazehack.generator import generate_maze, get_random_variable_position
 from mazehack.navigator import run_instructions
 from mazehack.navigator import compile
@@ -27,10 +27,10 @@ if __name__ == "__main__":
                     for x in range(0, maze["x"]):
                         if x == maze["start_x"] and y == maze["start_y"]:
                             string.append("@")
-                        elif is_passable(maze["structure"][x][y]):
-                            string.append(" ")
-                        else :
+                        elif is_wall(maze["structure"][x][y]):
                             string.append("#")
+                        else :
+                            string.append(" ")
                     print("".join(string))
                 print("StartX: " + str(maze["start_x"]))
                 print("StartY: " + str(maze["start_y"]))
