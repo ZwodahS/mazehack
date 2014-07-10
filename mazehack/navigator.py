@@ -18,7 +18,6 @@ def is_decision(maze, program_state):
     return False
 
 def move_instruction(maze, program_state):
-    print("MOVE")
     program_state["logs"].append("".join(["[Executing Move Instruction] Move"]))
     success, time = navigation.move_in_this_direction(maze, program_state)
     while success and not mazedef.is_decision_point(maze, program_state["x"], program_state["y"], program_state["direction"]):
@@ -29,14 +28,12 @@ def move_instruction(maze, program_state):
     add_information(maze, program_state)
 
 def turn_instruction(maze, program_state, relative_direction):
-    print("TURN")
     program_state["logs"].append("".join(["[Executing Turn Instruction] Turn ", mazedef.get_relative_direction_string(relative_direction)]))
     new_direction = mazedef.get_direction_of(relative_direction, program_state["direction"])
     program_state["direction"] = new_direction
     add_information(maze, program_state)
 
 def begin_instruction(maze, program_state):
-    print("BEGIN")
     program_state["logs"].append("".join(["[Begin - ]"]))
     add_information(maze, program_state)
 
@@ -65,7 +62,6 @@ def add_information(maze, program_state):
     if program_state["x"] == maze["start_x"] and program_state["y"] == maze["start_y"] :
         program_state["logs"].append("".join(["[    ","At entrance", "]"]))
 
-    program_state["logs"].append(" ".join([str(program_state["x"]), str(program_state["y"])]))
 """
 The main run instructions method, all that you need.
 """
