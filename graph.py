@@ -1,6 +1,6 @@
 import sys
 import random
-from mazehack import mazedef, generator
+from mazehack import mazedef, generator, navigation
 from mazehack.mazedef import NORTH, SOUTH, EAST, WEST
 from mazehack.mazedef import FRONT, BACK, RIGHT, LEFT 
 """
@@ -10,43 +10,14 @@ def move_to(maze, target_pos_x, target_pos_y, traverser):
     traverser["x"] = target_pos_x
     traverser["y"] = target_pos_y
     return 1
-
-# adapted from the one in navigator
-def move_in_this_direction(maze, traverser):
-    time_required = 0
-    ## get the relative direction that the program can pass
-    passable = get_passable_relative_direction(maze, traverser)
-
-    direction = traverser["direction"]
-    if passable[FRONT] :  #if the front is passable, we just move in front
-        direction = traverser["direction"]
-    else:                 # front is not passable, we want check if both left and right is passable
-        # if both left and right is passable, we can't make the decision, so we don't move
-        if passable[LEFT] and passable[RIGHT]:
-            return False, 0
-        elif passable[LEFT]:
-            direction = get_direction_of(LEFT, traverser["direction"])
-        elif passable[RIGHT]:
-            direction = get_direction_of(RIGHT, traverser["direction"])
-        else:  # the only exit from this tile is back
-            return False, 0
-    
-    traverser["direction"] = direction
-    direction_mod_x, direction_mod_y = get_direction_mod(traverser["direction"])
-    target_pos_x, target_pos_y = traverser["x"] + direction_mod_x, traverser["y"] + direction_mod_y
-    time_required = move_to(maze, target_pos_x, target_pos_y, traverser)
-    return True, time_required
 """
 move from the current position to the next part of the maze
 """
 def move_to_next_node(maze, traverser):
-    structure = maze["structure"]
-    success, time = move_in_this_direction(maze, traverser)
-    while success:
-        success, cost = move_in_this_direction(maze, traverser)
+    success, time = navigation.move_in_this_direction(maze, traverser)
+    while success and not mazedef.is_decision_point(maze, traverser["x"], traverser["y"], traverser["direction"]):
+        success, cost = navigation.move_in_this_direction(maze, traverser)
         time += cost
-        if is_decision(maze, traverser) or not success:
-            break
     return time
 """
 Find a node in nodes, that is a x, y position
@@ -66,14 +37,14 @@ def generate_graph(maze):
     nodes = []
     
     # randomly select a spot from the map that is a junction
-    pos_x, pos_y = get_random_passable_position(maze["x"], maze["y"])
+    pos_x, pos_y = generator.get_random_passable_position(maze["x"], maze["y"])
     traverser = { "x" : pos_x, "y" : pos_y, "direction" : NORTH}
-    passable = get_passable_direction(maze, traverser)
+    passable = mazedef.get_passable_direction(maze, traverser["x"], traverser["y"], mazedef.can_pass_through)
     while sum(passable) < 3 :
-        pos_x, pos_y = get_random_passable_position(maze["x"], maze["y"])
+        pos_x, pos_y = generator.get_random_passable_position(maze["x"], maze["y"])
         traverser["x"] = pos_x
         traverser["y"] = pos_y
-        passable = get_passable_direction(maze, traverser)
+        passable = mazedef.get_passable_direction(maze, traverser["x"], traverser["y"], mazedef.can_pass_through)
     
     # create the initial node
     node = { "id" : len(nodes), "x" : traverser["x"], "y" : traverser["y"] , "edges" : [] }
@@ -122,7 +93,7 @@ def generate_graph(maze):
             edge["node"] = new_node["id"]
             current["node"]["edges"].append(edge)
 
-            passable = get_passable_direction(maze, traverser)
+            passable = mazedef.get_passable_direction(maze, traverser["x"], traverser["y"], mazedef.can_pass_through)
             stack.append( { "node" : new_node, "N" : passable[NORTH], "S" : passable[SOUTH], "E" : passable[EAST], "W" : passable[WEST] })
         
     return nodes
@@ -136,7 +107,7 @@ if __name__ == "__main__" :
             seedValue = int(sys.argv[1])
             random.seed(seedValue)
 
-    maze = generator.generate_maze(11, 11, {"holes" : 30})
+    maze = generator.generate_maze(7, 7)
     for y in range(0, maze["y"]):
         string = []
         for x in range(0, maze["x"]):

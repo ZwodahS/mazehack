@@ -23,10 +23,10 @@ def generate_maze(x, y, config={}):
         "structure" : structure,
     }
 
-    starting_pos_x = randint(0, x-2)
+    starting_pos_x = randint(1, x-2)
     if not starting_pos_x % 2:
         starting_pos_x -= 1
-    starting_pos_y = randint(0, y-2)
+    starting_pos_y = randint(1, y-2)
     if not starting_pos_y % 2:
         starting_pos_y -= 1
     pos = (starting_pos_x, starting_pos_y)
