@@ -33,17 +33,19 @@ def generate_maze(x, y, config={}):
        
     moves = [] 
     moves.append(pos)
+    loop = config["loop"] if "loop" in config else 0
     
+    print( "".join(["loop : ", str(loop)]))
     while len(moves) > 0 :
         possible_directions = []
         pos_x, pos_y = pos
-        if pos_x + 2 < x and is_wall(structure[pos_x + 2][pos_y]):
+        if pos_x + 2 < x and (is_wall(structure[pos_x + 2][pos_y]) or (randint(0, 100) < loop)) :
             possible_directions.append(EAST)
-        if pos_x - 2 > 0 and is_wall(structure[pos_x - 2][pos_y]):
+        if pos_x - 2 > 0 and (is_wall(structure[pos_x - 2][pos_y]) or (randint(0, 100) < loop)) :
             possible_directions.append(WEST)
-        if pos_y + 2 < y and is_wall(structure[pos_x][pos_y + 2]):
+        if pos_y + 2 < y and (is_wall(structure[pos_x][pos_y + 2]) or (randint(0, 100) < loop)) :
             possible_directions.append(SOUTH)
-        if pos_y - 2 > 0 and is_wall(structure[pos_x][pos_y - 2]):
+        if pos_y - 2 > 0 and (is_wall(structure[pos_x][pos_y - 2]) or (randint(0, 100) < loop)) :
             possible_directions.append(NORTH)
         if(len(possible_directions)):
             direction = choice(possible_directions)
@@ -51,9 +53,13 @@ def generate_maze(x, y, config={}):
             target_x, target_y = (pos_x + direction_x, pos_y + direction_y)
             set_wall(maze, target_x, target_y, False)
             target_x, target_y = (target_x + direction_x, target_y + direction_y)
+            dontadd = False
+            if not is_wall(structure[target_x][target_y]):
+                dontadd = True
             set_wall(maze, target_x, target_y, False)
-            pos = (target_x, target_y)
-            moves.append(pos)
+            if not dontadd :
+                pos = (target_x, target_y)
+                moves.append(pos)
         else:
             pos = moves.pop()
     
